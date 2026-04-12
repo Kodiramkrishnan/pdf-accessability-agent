@@ -1,0 +1,57 @@
+{
+  "input": "sample.pdf",
+  "output": "out-only.pdf",
+  "assumed_default_lang": true,
+  "assumed_title_from_filename": true,
+  "catalog_before": {
+    "lang": "",
+    "markinfo_marked": "",
+    "struct_tree_root": "no",
+    "title": ""
+  },
+  "catalog_after": {
+    "lang": "en-US",
+    "markinfo_marked": "True",
+    "struct_tree_root": "no",
+    "title": "sample"
+  },
+  "issues_before": [
+    {
+      "code": "DOC_LANG",
+      "message": "Document /Lang is missing or empty (PDF/UA-1 7.1).",
+      "severity": "fail",
+      "page": null,
+      "details": {}
+    },
+    {
+      "code": "MARKINFO_MISSING",
+      "message": "/MarkInfo missing; PDF should declare marked content usage.",
+      "severity": "warn",
+      "page": null,
+      "details": {}
+    },
+    {
+      "code": "NO_STRUCT_TREE",
+      "message": "No /StructTreeRoot \u2014 document is not a tagged PDF (PDF/UA-1 7.1).",
+      "severity": "fail",
+      "page": null,
+      "details": {}
+    },
+    {
+      "code": "METADATA_TITLE",
+      "message": "Document title missing in metadata (WCAG 2.x 2.4.2 / PDF mapping).",
+      "severity": "warn",
+      "page": null,
+      "details": {}
+    }
+  ],
+  "issues_after": [
+    {
+      "code": "NO_STRUCT_TREE",
+      "message": "No /StructTreeRoot \u2014 document is not a tagged PDF (PDF/UA-1 7.1).",
+      "severity": "fail",
+      "page": null,
+      "details": {}
+    }
+  ]
+}
