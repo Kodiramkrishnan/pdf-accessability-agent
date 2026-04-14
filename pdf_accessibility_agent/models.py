@@ -35,3 +35,20 @@ class RemediationPlan(BaseModel):
 
     summary: str = ""
     actions: list[RemediationAction] = Field(default_factory=list)
+
+
+class PacPredictionIssue(BaseModel):
+    """LLM-estimated PAC blocker candidate."""
+
+    code: str
+    message: str
+    confidence: float = 0.0
+
+
+class PacPrediction(BaseModel):
+    """LLM prediction for PAC-zero likelihood."""
+
+    predicted_zero_errors: bool = False
+    confidence: float = 0.0
+    blockers: list[PacPredictionIssue] = Field(default_factory=list)
+    notes: str = ""

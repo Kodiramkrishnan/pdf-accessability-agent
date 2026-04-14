@@ -1,0 +1,346 @@
+{
+  "input": "85301f2.pdf",
+  "output": "85301f2_accessible.pdf",
+  "assumed_default_lang": true,
+  "assumed_title_from_filename": true,
+  "catalog_before": {
+    "lang": "",
+    "markinfo_marked": "",
+    "struct_tree_root": "no",
+    "title": ""
+  },
+  "catalog_after": {
+    "lang": "en-US",
+    "markinfo_marked": "True",
+    "struct_tree_root": "yes",
+    "title": "85301f2"
+  },
+  "issues_before": [
+    {
+      "code": "DOC_LANG",
+      "message": "Document /Lang is missing or empty (PDF/UA-1 7.1).",
+      "severity": "fail",
+      "page": null,
+      "details": {}
+    },
+    {
+      "code": "MARKINFO_MISSING",
+      "message": "/MarkInfo missing; PDF should declare marked content usage.",
+      "severity": "warn",
+      "page": null,
+      "details": {}
+    },
+    {
+      "code": "NO_STRUCT_TREE",
+      "message": "No /StructTreeRoot \u2014 document is not a tagged PDF (PDF/UA-1 7.1).",
+      "severity": "fail",
+      "page": null,
+      "details": {}
+    },
+    {
+      "code": "METADATA_TITLE",
+      "message": "Document title missing in metadata (WCAG 2.x 2.4.2 / PDF mapping).",
+      "severity": "warn",
+      "page": null,
+      "details": {}
+    },
+    {
+      "code": "IMAGE_XREF",
+      "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+      "severity": "info",
+      "page": 1,
+      "details": {
+        "xref": 22
+      }
+    }
+  ],
+  "issues_after": [
+    {
+      "code": "IMAGE_XREF",
+      "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+      "severity": "info",
+      "page": 1,
+      "details": {
+        "xref": 25
+      }
+    }
+  ],
+  "pipeline": "local_autotag+catalog",
+  "internal_validation": {
+    "passed": false,
+    "strict": true,
+    "use_llm_validator": true,
+    "max_fix_iterations": 20,
+    "fix_iterations_used": 20,
+    "remaining_issues": [
+      {
+        "code": "IMAGE_XREF",
+        "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+        "confidence": 0.8
+      }
+    ],
+    "heuristic_remaining_issues": [],
+    "llm_remaining_blockers": [
+      {
+        "code": "IMAGE_XREF",
+        "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+        "confidence": 0.8
+      }
+    ],
+    "llm_validation_trace": [
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text suggests potential accessibility issues."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text suggests potential accessibility issues."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text suggests potential accessibility issues."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      },
+      {
+        "predicted_zero_errors": false,
+        "confidence": 0.7,
+        "blockers": [
+          {
+            "code": "IMAGE_XREF",
+            "message": "Image detected; verify Figure structure and Alt/ActualText in tagged PDF.",
+            "confidence": 0.8
+          }
+        ],
+        "notes": "The presence of an image without verified alternative text raises concerns about accessibility compliance."
+      }
+    ],
+    "check_note": "Internal PAC-like gate combining rule checks and optional LLM PAC prediction. PAC desktop validator is still the final authority."
+  }
+}

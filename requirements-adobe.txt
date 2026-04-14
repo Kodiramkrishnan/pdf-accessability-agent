@@ -1,0 +1,4 @@
+# Optional: Adobe PDF Services — Auto-Tag API (tagged PDF + optional report).
+# Get credentials: https://developer.adobe.com/document-services/docs/overview/pdf-accessibility-auto-tag-api/
+-r requirements.txt
+pdfservices-sdk>=4.0.0

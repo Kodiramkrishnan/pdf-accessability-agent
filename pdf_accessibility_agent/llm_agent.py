@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 
-from pdf_accessibility_agent.models import RemediationPlan
+from pdf_accessibility_agent.models import PacPrediction, RemediationPlan
 
 
 SYSTEM_PROMPT = """You are a PDF accessibility remediation planner targeting PDF/UA-1 and WCAG 2.x
@@ -22,6 +22,26 @@ mappings used by validators like PAC. Output ONLY valid JSON matching this schem
   ]
 }
 Only use action type "set_catalog" in your JSON. Do not invent unsupported actions."""
+
+PAC_VALIDATION_SYSTEM_PROMPT = """You are a PDF accessibility validation estimator.
+Estimate whether a PDF is likely to produce ZERO ERRORS in PAC PDF Accessibility Checker.
+Output ONLY valid JSON matching this schema:
+{
+  "predicted_zero_errors": true|false,
+  "confidence": 0.0_to_1.0,
+  "blockers": [
+    {
+      "code": "SHORT_CODE",
+      "message": "short reason likely to fail PAC",
+      "confidence": 0.0_to_1.0
+    }
+  ],
+  "notes": "short explanation"
+}
+Rules:
+- Be conservative: if uncertain, set predicted_zero_errors=false.
+- Use blockers for likely PAC errors only.
+- Do not output markdown or text outside JSON."""
 
 
 def plan_from_openai_compatible(
@@ -75,3 +95,52 @@ def plan_from_openai_compatible(
     content = data["choices"][0]["message"]["content"]
     parsed = json.loads(content)
     return RemediationPlan.model_validate(parsed)
+
+
+def predict_pac_zero_from_openai_compatible(
+    *,
+    catalog: dict[str, str],
+    issues: list[dict[str, Any]],
+    model: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> PacPrediction:
+    """
+    Ask an OpenAI-compatible model to estimate PAC-zero likelihood.
+
+    This is a predictive validator, not an authoritative PAC result.
+    """
+    key = api_key or os.environ.get("OPENAI_API_KEY")
+    if not key:
+        raise RuntimeError("OPENAI_API_KEY is not set and api_key was not provided.")
+
+    url_base = base_url or os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    mdl = model or os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    url = url_base.rstrip("/") + "/chat/completions"
+
+    payload = {
+        "catalog": catalog,
+        "issues_after": issues,
+        "instruction": "Predict PAC zero-error outcome conservatively from provided signals.",
+    }
+    body = {
+        "model": mdl,
+        "temperature": 0.1,
+        "response_format": {"type": "json_object"},
+        "messages": [
+            {"role": "system", "content": PAC_VALIDATION_SYSTEM_PROMPT},
+            {"role": "user", "content": json.dumps(payload)},
+        ],
+    }
+
+    with httpx.Client(timeout=90) as client:
+        r = client.post(
+            url,
+            headers={"Authorization": f"Bearer {key}"},
+            json=body,
+        )
+        r.raise_for_status()
+        data = r.json()
+    content = data["choices"][0]["message"]["content"]
+    parsed = json.loads(content)
+    return PacPrediction.model_validate(parsed)
