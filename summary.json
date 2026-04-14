@@ -65,5 +65,25 @@
       }
     }
   ],
-  "pipeline": "local_autotag+catalog"
+  "pipeline": "local_autotag+catalog",
+  "internal_validation": {
+    "passed": true,
+    "strict": true,
+    "use_llm_validator": false,
+    "retag_mode": "local",
+    "no_progress_limit": 5,
+    "no_progress_streak": 0,
+    "remaining_issue_history": [
+      0
+    ],
+    "best_remaining_issues": 0,
+    "stop_reason": "passed",
+    "max_fix_iterations": -1,
+    "fix_iterations_used": 0,
+    "remaining_issues": [],
+    "heuristic_remaining_issues": [],
+    "llm_remaining_blockers": [],
+    "llm_validation_trace": [],
+    "check_note": "Internal PAC-like gate combining rule checks and optional LLM PAC prediction. PAC desktop validator is still the final authority."
+  }
 }

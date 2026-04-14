@@ -188,8 +188,33 @@ python -m pdf_accessibility_agent.cli process input.pdf output.pdf \
 What this does:
 
 - Runs internal checks on the generated output.
-- If blocking issues remain, retries local fixes iteratively.
+- If blocking issues remain, retries retag/fix iteratively.
 - Fails the command (non-zero exit) if unresolved blockers remain after max iterations.
+- Set `--max-fix-iterations -1` for an unlimited loop (stops only when checks pass or the run is interrupted).
+- Optional safeguard: `--no-progress-limit N` stops early when remaining issue count does not improve for `N` consecutive iterations.
+
+Choose repair strategy used inside the zero-check loop:
+
+```bash
+python -m pdf_accessibility_agent.cli process input.pdf output.pdf \
+  --adobe-autotag \
+  --require-zero-check \
+  --zero-check-retag-mode adobe
+
+# Example with no-progress guard for long runs:
+python -m pdf_accessibility_agent.cli process input.pdf output.pdf \
+  --local-autotag \
+  --require-zero-check \
+  --max-fix-iterations -1 \
+  --no-progress-limit 5
+```
+
+`--zero-check-retag-mode` options:
+
+- `auto` (default): uses `adobe` when `--adobe-autotag` is enabled, otherwise `local`.
+- `adobe`: re-run Adobe Auto-Tag each iteration (requires credentials).
+- `local`: use local bootstrap retag each iteration.
+- `none`: skip retagging and only re-apply catalog fixes.
 
 Optional strict mode:
 

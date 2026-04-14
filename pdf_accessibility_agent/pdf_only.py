@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from pdf_accessibility_agent.analyzer import analyze_pdf, catalog_snapshot
+from pdf_accessibility_agent.adobe_autotag import adobe_autotag_pdf
 from pdf_accessibility_agent.llm_agent import (
     plan_from_openai_compatible,
     predict_pac_zero_from_openai_compatible,
@@ -162,9 +163,12 @@ def enforce_internal_zero_check(
     strict: bool = False,
     max_fix_iterations: int = 3,
     use_llm_validator: bool = False,
+    retag_mode: str = "local",
+    shift_headings: bool = False,
+    no_progress_limit: int = 0,
 ) -> dict[str, Any]:
     """
-    Validate the generated PDF and attempt iterative local repairs.
+    Validate the generated PDF and attempt iterative repairs.
 
     The check uses this package's PAC-oriented heuristic analyzer. If blocking
     issues remain after max_fix_iterations, the caller should treat the run as
@@ -177,6 +181,10 @@ def enforce_internal_zero_check(
 
     attempts = 0
     llm_trace: list[dict[str, Any]] = []
+    remaining_history: list[int] = []
+    best_remaining: int | None = None
+    no_progress_streak = 0
+    stop_reason = "passed"
 
     heuristic_blocking = _blocking_issues(dst, strict=strict)
     llm_blocking: list[dict[str, Any]] = []
@@ -184,17 +192,40 @@ def enforce_internal_zero_check(
         llm_blocking, prediction = _llm_validation_blockers(dst)
         llm_trace.append(prediction)
 
-    while (heuristic_blocking or llm_blocking) and attempts < max_fix_iterations:
+    initial_remaining = len(heuristic_blocking)
+    if llm_blocking:
+        merged0 = heuristic_blocking.copy()
+        for item in llm_blocking:
+            if item not in merged0:
+                merged0.append(item)
+        initial_remaining = len(merged0)
+    remaining_history.append(initial_remaining)
+    best_remaining = initial_remaining
+
+    unlimited = max_fix_iterations < 0
+    while (heuristic_blocking or llm_blocking) and (unlimited or attempts < max_fix_iterations):
         attempts += 1
         with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
             tmp_path = Path(tmp.name)
         try:
-            local_autotag_pdf(
-                dst,
-                tmp_path,
-                language=lang_seed,
-                title=title_seed,
-            )
+            if retag_mode == "adobe":
+                adobe_autotag_pdf(
+                    dst,
+                    tmp_path,
+                    report_path=None,
+                    shift_headings=shift_headings,
+                )
+            elif retag_mode == "local":
+                local_autotag_pdf(
+                    dst,
+                    tmp_path,
+                    language=lang_seed,
+                    title=title_seed,
+                )
+            elif retag_mode == "none":
+                tmp_path.write_bytes(dst.read_bytes())
+            else:
+                raise ValueError(f"Unsupported retag mode: {retag_mode}")
             process_pdf_only(
                 tmp_path,
                 dst,
@@ -215,15 +246,43 @@ def enforce_internal_zero_check(
         else:
             llm_blocking = []
 
+        merged_iter = heuristic_blocking.copy()
+        for item in llm_blocking:
+            if item not in merged_iter:
+                merged_iter.append(item)
+        current_remaining = len(merged_iter)
+        remaining_history.append(current_remaining)
+
+        if best_remaining is None or current_remaining < best_remaining:
+            best_remaining = current_remaining
+            no_progress_streak = 0
+        else:
+            no_progress_streak += 1
+
+        if no_progress_limit > 0 and no_progress_streak >= no_progress_limit:
+            stop_reason = "no_progress_limit_reached"
+            break
+
     remaining = heuristic_blocking.copy()
     for item in llm_blocking:
         if item not in remaining:
             remaining.append(item)
 
+    if len(remaining) == 0:
+        stop_reason = "passed"
+    elif stop_reason != "no_progress_limit_reached":
+        stop_reason = "max_iterations_reached"
+
     return {
         "passed": len(remaining) == 0,
         "strict": strict,
         "use_llm_validator": use_llm_validator,
+        "retag_mode": retag_mode,
+        "no_progress_limit": no_progress_limit,
+        "no_progress_streak": no_progress_streak,
+        "remaining_issue_history": remaining_history,
+        "best_remaining_issues": best_remaining,
+        "stop_reason": stop_reason,
         "max_fix_iterations": max_fix_iterations,
         "fix_iterations_used": attempts,
         "remaining_issues": remaining,
