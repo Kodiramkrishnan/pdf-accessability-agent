@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import tempfile
 from pathlib import Path
 
@@ -14,33 +13,19 @@ from pdf_accessibility_agent.pdf_only import enforce_internal_zero_check, proces
 from pdf_accessibility_agent.remediate import apply_plan, rules_plan_from_gaps
 
 
-def _load_dotenv_if_present() -> None:
-    """
-    Load environment variables from a local .env file if present.
-
-    Existing environment variables are not overridden.
-    """
-    candidates = [Path.cwd() / ".env", Path(__file__).resolve().parents[1] / ".env"]
-    env_path = next((p for p in candidates if p.exists()), None)
-    if env_path is None:
-        return
-
-    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        k = key.strip()
-        if not k or k in os.environ:
-            continue
-        v = value.strip()
-        if len(v) >= 2 and ((v[0] == v[-1] == '"') or (v[0] == v[-1] == "'")):
-            v = v[1:-1]
-        os.environ[k] = v
+def _require_input_pdf(path: Path, *, label: str) -> Path:
+    """Exit with a clear message if the input PDF path is wrong (common CLI mistake)."""
+    p = path.expanduser()
+    if not p.is_file():
+        raise SystemExit(
+            f"{label} not found or is not a file: {path}\n"
+            f"  Hint: run from the directory that contains the PDF, or pass an absolute path.\n"
+            f"  Resolved: {p.resolve()}"
+        )
+    return p
 
 
 def main() -> None:
-    _load_dotenv_if_present()
     parser = argparse.ArgumentParser(
         description="PDF-only accessibility helper: analyze and apply catalog/metadata fixes (PAC-oriented).",
     )
@@ -130,31 +115,12 @@ def main() -> None:
         "--max-fix-iterations",
         type=int,
         default=3,
-        help="Maximum auto-fix rounds during --require-zero-check (default: 3, use -1 for unlimited loop).",
+        help="Maximum auto-fix rounds during --require-zero-check (default: 3).",
     )
     p_proc.add_argument(
         "--llm-zero-check",
         action="store_true",
         help="Use OpenAI-compatible model to predict PAC-zero internally each iteration.",
-    )
-    p_proc.add_argument(
-        "--zero-check-retag-mode",
-        type=str,
-        choices=["auto", "local", "adobe", "none"],
-        default="auto",
-        help=(
-            "Retag strategy during --require-zero-check repair iterations: "
-            "auto (adobe when --adobe-autotag else local), local, adobe, or none."
-        ),
-    )
-    p_proc.add_argument(
-        "--no-progress-limit",
-        type=int,
-        default=0,
-        help=(
-            "Stop zero-check loop if issue count does not improve for N consecutive "
-            "iterations (0 disables; useful with --max-fix-iterations -1)."
-        ),
     )
 
     p_adobe = sub.add_parser(
@@ -187,12 +153,14 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.cmd == "analyze":
+        _require_input_pdf(args.pdf, label="Input PDF")
         issues = analyze_pdf(args.pdf)
         snap = catalog_snapshot(args.pdf)
         print(json.dumps({"catalog": snap, "issues": [i.model_dump() for i in issues]}, indent=2))
         return
 
     if args.cmd == "remediate":
+        _require_input_pdf(args.input, label="Input PDF")
         if args.llm:
             issues = analyze_pdf(args.input)
             snap = catalog_snapshot(args.input)
@@ -208,16 +176,11 @@ def main() -> None:
         return
 
     if args.cmd == "process":
-        if args.max_fix_iterations < -1:
-            parser.error("--max-fix-iterations must be >= -1.")
-        if args.no_progress_limit < 0:
-            parser.error("--no-progress-limit must be >= 0.")
+        _require_input_pdf(args.input, label="Input PDF")
+        if args.max_fix_iterations < 0:
+            parser.error("--max-fix-iterations must be >= 0.")
         if args.llm_zero_check and not args.require_zero_check:
             parser.error("--llm-zero-check requires --require-zero-check.")
-        if args.zero_check_retag_mode != "auto" and not args.require_zero_check:
-            parser.error("--zero-check-retag-mode requires --require-zero-check.")
-        if args.no_progress_limit > 0 and not args.require_zero_check:
-            parser.error("--no-progress-limit requires --require-zero-check.")
         if args.adobe_report and not args.adobe_autotag:
             parser.error("--adobe-report requires --adobe-autotag.")
         if args.adobe_autotag and args.local_autotag:
@@ -285,9 +248,6 @@ def main() -> None:
             args.report.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
         if args.require_zero_check:
-            retag_mode = args.zero_check_retag_mode
-            if retag_mode == "auto":
-                retag_mode = "adobe" if args.adobe_autotag else "local"
             validation = enforce_internal_zero_check(
                 input_path=args.input,
                 output_path=args.output,
@@ -298,9 +258,6 @@ def main() -> None:
                 strict=args.strict_zero_check,
                 max_fix_iterations=args.max_fix_iterations,
                 use_llm_validator=args.llm_zero_check,
-                retag_mode=retag_mode,
-                shift_headings=args.shift_headings,
-                no_progress_limit=args.no_progress_limit,
             )
             payload["internal_validation"] = validation
             if args.report:
@@ -314,6 +271,7 @@ def main() -> None:
         return
 
     if args.cmd == "adobe-autotag":
+        _require_input_pdf(args.input, label="Input PDF")
         adobe_autotag_pdf(
             args.input,
             args.output,
@@ -323,6 +281,7 @@ def main() -> None:
         return
 
     if args.cmd == "local-autotag":
+        _require_input_pdf(args.input, label="Input PDF")
         local_autotag_pdf(
             args.input,
             args.output,

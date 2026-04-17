@@ -5,6 +5,8 @@ from pathlib import Path
 import pikepdf
 from pikepdf import Name, String
 
+from pdf_accessibility_agent.remediate import _ensure_pdfua_identification_xmp
+
 
 def _as_name(value: str) -> Name:
     return Name(value if value.startswith("/") else f"/{value}")
@@ -19,15 +21,16 @@ def _ensure_mark_info(root: pikepdf.Dictionary) -> None:
 
 
 def _ensure_docinfo_and_title(pdf: pikepdf.Pdf, title: str | None) -> None:
-    if not title:
-        return
     with pdf.open_metadata() as meta:
-        meta.title = title
-    di = pdf.docinfo
-    if di is None:
-        pdf.docinfo = pikepdf.Dictionary()
+        if title:
+            meta.title = title
+        _ensure_pdfua_identification_xmp(meta)
+    if title:
         di = pdf.docinfo
-    di[Name("/Title")] = String(title)
+        if di is None:
+            pdf.docinfo = pikepdf.Dictionary()
+            di = pdf.docinfo
+        di[Name("/Title")] = String(title)
 
 
 def _ensure_minimal_structure_tree(pdf: pikepdf.Pdf) -> None:

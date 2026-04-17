@@ -1,6 +1,6 @@
 {
   "input": "85301f2.pdf",
-  "output": "output_04.pdf",
+  "output": "output.pdf",
   "assumed_default_lang": true,
   "assumed_title_from_filename": true,
   "catalog_before": {
@@ -61,9 +61,21 @@
       "severity": "info",
       "page": 1,
       "details": {
-        "xref": 317
+        "xref": 314
       }
     }
   ],
-  "pipeline": "adobe_autotag+catalog"
+  "pipeline": "adobe_autotag+catalog",
+  "internal_validation": {
+    "passed": true,
+    "strict": false,
+    "use_llm_validator": false,
+    "max_fix_iterations": 10,
+    "fix_iterations_used": 0,
+    "remaining_issues": [],
+    "heuristic_remaining_issues": [],
+    "llm_remaining_blockers": [],
+    "llm_validation_trace": [],
+    "check_note": "Internal PAC-like gate combining rule checks and optional LLM PAC prediction. PAC desktop validator is still the final authority."
+  }
 }
